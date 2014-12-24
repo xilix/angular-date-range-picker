@@ -10,15 +10,9 @@
   <script type="text/javascript">
     angular.module("testapp", ["dateRangePicker"])
     angular.module("testapp").controller("TestCtrl", function($scope){
-      $scope.range = moment().range("2012-11-05", "2013-01-25")
-
       $scope.change = function(){
-        $scope.range2 = moment().range("2012-11-15", "2012-12-25")
+        $scope.range2 = moment().range("2012-12-15", "2012-12-25")
       }
-
-      $scope.fireCallback = function(range) {
-        console.log(range);
-      };
 
       $scope.date = null
     })
@@ -35,14 +29,9 @@
   <div ng-controller="TestCtrl">
     <div>
       <h1>Date range picker</h1>
-      <date-range-picker ng-model="range"></date-range-picker>
       <pre>{{ range.start.toDate() }} - {{ range.end.toDate() }}</pre>
-      <date-range-picker ng-model="range2" ranged="true" callback="fireCallback(range2)"></date-range-picker>
+      <date-range-picker number-of-months="1" ng-model="range2" data-apply-on-select="true" ranged="true" callback="fireCallback(range2)"></date-range-picker>
       <button ng-click="change()">Change</button>
-    </div>
-    <div>
-      <h1>Simple date picker</h1>
-      <date-range-picker ng-model="date" ranged="false"></date-range-picker>
     </div>
   </div>
 </body>
