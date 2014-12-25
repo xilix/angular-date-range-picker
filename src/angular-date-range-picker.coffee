@@ -4,11 +4,10 @@ angular.module("dateRangePicker").directive "dateRangePicker", ["$compile", "$ti
   # constants
   pickerTemplate = """
   <div ng-show="visible" class="angular-date-range-picker__picker scale-fade" ng-click="handlePickerClick($event)" ng-class="{'angular-date-range-picker--ranged': showRanged }">
-    <div class="angular-date-range-picker__timesheet">
-      <a ng-click="move(-1, $event)" class="angular-date-range-picker__prev-month">&#9664;</a>
-      <div bindonce ng-repeat="month in months" class="angular-date-range-picker__month">
-        <div class="angular-date-range-picker__month-name" bo-text="month.name"></div>
-        {{month.weeks[1]}}
+    <div class="angular-date-range-picker__timesheet" ng-repeat="month in months">
+      <a ng-click="month.move(-1, $event)" class="angular-date-range-picker__prev-month" ng-show="month.hasPrevious">&#9664;</a>
+      <div bindonce class="angular-date-range-picker__month">
+        <div class="angular-date-range-picker__month-name">{{month.name}}</div>
         <table class="angular-date-range-picker__calendar">
           <tr>
             <th bindonce ng-repeat="day in month.weeks[1]" class="angular-date-range-picker__calendar-weekday" bo-text="day.date.format('dd')">
@@ -28,7 +27,7 @@ angular.module("dateRangePicker").directive "dateRangePicker", ["$compile", "$ti
           </tr>
         </table>
       </div>
-      <a ng-click="move(+1, $event)" class="angular-date-range-picker__next-month">&#9654;</a>
+      <a ng-click="month.move(+1, $event)" class="angular-date-range-picker__next-month" ng-show="month.hasNext">&#9654;</a>
     </div>
     <div class="angular-date-range-picker__panel">
       <div ng-show="showRanged">
@@ -155,7 +154,9 @@ angular.module("dateRangePicker").directive "dateRangePicker", ["$compile", "$ti
 
 
     _prepare = () ->
-      $scope.months = []
+      $scope.months[0].weeks = []
+      $scope.months[1].weeks = []
+
       startMonth = $scope.range.start.year()*12 + $scope.range.start.month()
       endMonth = $scope.range.end.year()*12 + $scope.range.end.month()
       startDay = moment().startOf("week").day()
@@ -180,14 +181,6 @@ angular.module("dateRangePicker").directive "dateRangePicker", ["$compile", "$ti
           sel = date.isSame($scope.selection)
           dis = moment().diff(date, 'days') > 0 if $scope.pastDates
 
-        $scope.months[1] ||= {name: date.format("MMMM YYYY"), weeks: []}
-        $scope.months[1].weeks[w] ||= []
-        $scope.months[1].weeks[w][d] =
-          date:     date
-          selected: sel
-          disabled: dis
-          start:    ($scope.start && $scope.start.unix() == date.unix())
-
         if (m == startMonth)
           $scope.months[0] ||= {name: date.format("MMMM YYYY"), weeks: []}
           $scope.months[0].weeks[w] ||= []
@@ -197,20 +190,26 @@ angular.module("dateRangePicker").directive "dateRangePicker", ["$compile", "$ti
             disabled: dis
             start:    ($scope.start && $scope.start.unix() == date.unix())
 
-
-
+        if (m == endMonth)
+          $scope.months[1] ||= {name: date.format("MMMM YYYY"), weeks: []}
+          $scope.months[1].weeks[w] ||= []
+          $scope.months[1].weeks[w][d] =
+            date:     date
+            selected: sel
+            disabled: dis
+            start:    ($scope.start && $scope.start.unix() == date.unix())
 
       # Remove empty rows
       for m in $scope.months
         if !m.weeks[0]
           m.weeks.splice(0, 1)
 
-      console.log($scope.months)
-
       _checkQuickList()
+      _setMonthsName($scope.range)
+      _setMonthsMovement($scope.range)
 
       if $scope.selectingEnded && !$scope.start && $scope.applyOnSelect
-        $scope.selectingEnded =false 
+        $scope.selectingEnded =false
         $scope.ok()
 
 
@@ -253,10 +252,26 @@ angular.module("dateRangePicker").directive "dateRangePicker", ["$compile", "$ti
 
       _prepare()
 
-    $scope.move = (n, $event) ->
+    _setMonthsName = (range) ->
+      $scope.months[0].name = range.start.format("MMMM")
+      $scope.months[1].name = range.end.format("MMMM")
+
+    _setMonthsMovement = (range) ->
+      startMonth = range.start.year()*12 + range.start.month()
+      endMonth = range.end.year()*12 + range.end.month()
+
+      $scope.months[0].hasPrevious = true
+      $scope.months[0].hasNext = true
+      $scope.months[1].hasPrevious = true
+      $scope.months[1].hasNext = true
+      if (startMonth == endMonth)
+        $scope.months[0].hasNext = false
+        $scope.months[1].hasPrevious = false
+
+    _move = (monthIndex, n, $event) ->
       $event?.stopPropagation?()
       if $scope.showRanged
-        if n > 0
+        if monthIndex == 1
           $scope.range = moment().range(
             $scope.range.start.clone().startOf("month").startOf("day")
             $scope.range.end.add(n, 'months').endOf("month").endOf("day")
@@ -273,6 +288,8 @@ angular.module("dateRangePicker").directive "dateRangePicker", ["$compile", "$ti
           moment($scope.date).endOf("month")
         )
 
+      _setMonthsName($scope.range)
+      _setMonthsMovement($scope.range)
       _prepare()
 
     $scope.handlePickerClick = ($event) ->
@@ -310,5 +327,17 @@ angular.module("dateRangePicker").directive "dateRangePicker", ["$compile", "$ti
 
     _makeQuickList()
     _calculateRange()
+    $scope.months = [
+      {
+        move: (n, $event) -> _move(0, n, $event),
+        weeks: []
+      },
+      {
+        move: (n, $event) -> _move(1, n, $event),
+        weeks: []
+      }
+    ]
+    _setMonthsName($scope.range)
+    _setMonthsMovement($scope.range)
     _prepare()
 ]
