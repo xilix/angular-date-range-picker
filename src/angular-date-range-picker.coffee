@@ -34,8 +34,8 @@ angular.module("dateRangePicker").directive "dateRangePicker", ["$compile", "$ti
         Select range: <select ng-click="prevent_select($event)" ng-model="quick" ng-options="e.range as e.label for e in quickList"></select>
       </div>
       <div class="angular-date-range-picker__buttons" ng-show="!applyOnSelect">
-        <a ng-click="ok($event)" class="angular-date-range-picker__apply">Apply</a>
-        <a ng-click="hide($event)" class="angular-date-range-picker__cancel">cancel</a>
+        <a ng-click="ok($event)" class="angular-date-range-picker__apply">{{ textApply || "Apply"}}</a>
+        <a ng-click="hide($event)" class="angular-date-range-picker__cancel">{{ textCancel || "Cancel" }}</a>
       </div>
     </div>
   </div>
@@ -62,6 +62,8 @@ angular.module("dateRangePicker").directive "dateRangePicker", ["$compile", "$ti
     applyOnSelect: '='
     ranged: "="
     pastDates: "@"
+    textApply: "@"
+    textCancel: "@"
     callback: "&"
 
   link: ($scope, element, attrs) ->
