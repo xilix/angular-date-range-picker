@@ -30,7 +30,7 @@
     <div>
       <h1>Date range picker</h1>
       <pre>{{ range.start.toDate() }} - {{ range.end.toDate() }}</pre>
-      <date-range-picker number-of-months="1" ng-model="range2" data-apply-on-select="true" ranged="true" callback="fireCallback(range2)"></date-range-picker>
+      <date-range-picker number-of-months="1" ng-model="range2" data-apply-on-select="false" ranged="true" callback="fireCallback(range2)"></date-range-picker>
       <button ng-click="change()">Change</button>
     </div>
   </div>
