@@ -4,6 +4,7 @@ angular.module("dateRangePicker").directive "dateRangePicker", ["$compile", "$ti
   # constants
   pickerTemplate = """
   <div ng-show="visible" class="angular-date-range-picker__picker scale-fade" ng-click="handlePickerClick($event)" ng-class="{'angular-date-range-picker--ranged': showRanged }">
+    <div class="msgTopDatePicker"><div class="msgTopStartDatePicker">Start</div><div class="msgTopEndDatePicker">End</div></div>
     <div class="angular-date-range-picker__timesheet" ng-repeat="month in months">
       <a ng-click="month.move(-1, $event)" class="angular-date-range-picker__prev-month" ng-show="month.hasPrevious">&#9664;</a>
       <div bindonce class="angular-date-range-picker__month">
