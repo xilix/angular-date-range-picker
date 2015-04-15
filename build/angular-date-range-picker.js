@@ -76,7 +76,16 @@
           _calculateRange = function() {
             var end, start;
             if ($scope.showRanged) {
-              return $scope.range = $scope.selection ? (start = $scope.selection.start.clone().startOf("month").startOf("day"), end = $scope.selection.end.clone().endOf("month").startOf("day"), moment().range(start, end)) : moment().range(moment().startOf("month").startOf("day"), moment().endOf("month").endOf("day"));
+              $scope.range = $scope.selection ? (start = $scope.selection.start.clone().startOf("month").startOf("day"), end = $scope.selection.end.clone().endOf("month").startOf("day"), moment().range(start, end)) : moment().range(moment().startOf("month").startOf("day"), moment().endOf("month").endOf("day"));
+              if ($scope.model && $scope.model.start) {
+                $scope.start = $scope.model.start;
+              }
+              if ($scope.model && $scope.model.end) {
+                $scope.end = $scope.model.end;
+              }
+              if ($scope.start && $scope.end) {
+                return $scope.selection = moment().range($scope.start, $scope.end);
+              }
             } else {
               $scope.selection = false;
               $scope.selection = $scope.model || false;

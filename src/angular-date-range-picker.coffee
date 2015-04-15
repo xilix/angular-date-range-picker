@@ -133,6 +133,15 @@ angular.module("dateRangePicker").directive "dateRangePicker", ["$compile", "$ti
             moment().startOf("month").startOf("day"),
             moment().endOf("month").endOf("day")
           )
+
+        if $scope.model && $scope.model.start
+          $scope.start = $scope.model.start
+
+        if $scope.model && $scope.model.end
+          $scope.end = $scope.model.end
+
+        if $scope.start && $scope.end
+          $scope.selection = moment().range($scope.start, $scope.end)
       else
         $scope.selection = false
         $scope.selection = $scope.model || false
